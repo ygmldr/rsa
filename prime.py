@@ -11,7 +11,6 @@ def pt_pd(x):
     i = 3
     while(i <= r):
         if(x % i == 0):
-            print(i)
             return False
         i += 2
     return True
@@ -62,6 +61,14 @@ def Euler(Len,l):
                 break
             
 def quick_pow(a,n,p):
+    ret = 1
+    while(n > 0):
+        if((n & 1)==1):
+            ret = ret * a % p
+        a = a * a % p
+        n >>= 1
+    return ret
+    '''
     if(n == 1):
         return a
     t = quick_pow(a,n>>1,p) % p
@@ -69,13 +76,13 @@ def quick_pow(a,n,p):
         return t * t * a % p
     else:
         return t * t % p
-
+    '''
 def fakeprime(l,r,primelist):
     while(True):
         t = random.randint(l,r)
         fprime = True
-        if(t in primelist):
-            return t
+        #if(t in primelist):
+        #    return t
         for i in primelist:
             if(t % i == 0):
                 fprime = False
@@ -84,8 +91,8 @@ def fakeprime(l,r,primelist):
             return t
 
 def Miller_Rabin(pt,primelist):
-    if(pt in primelist):
-        return True
+    #if(pt in primelist):
+    #    return True
     if((pt & 1) == 0):
         return False
     u = pt - 1
@@ -107,18 +114,43 @@ def Miller_Rabin(pt,primelist):
     return True
 
 def make_prime(l,r,primelist,millerlist):
+    cnt = 0
     while(True):
         t = fakeprime(l,r,primelist)
+        print('made fakernum ',cnt,'，Miller test start')
+        cnt += 1
         if(Miller_Rabin(t,millerlist)):
             return t
 
+start = time.time()
+
 primelist=[]
-Erato(10000,primelist)
-millerlist=[]
-Erato(50,millerlist)
+Erato(100000,primelist)
 
-print(make_prime(int(1e200),int(1e201),primelist,millerlist))
+millerlist1=[]
+millerlist2=[]
+millerlist3=[]
 
+for i in range(2,10):
+    if(pt_pd(i)):
+        millerlist1.append(i)
+for i in range(10,100):
+    if(pt_pd(i)):
+        millerlist2.append(i)
+#print(len(millerlist1)+len(millerlist2))
+for i in range(100,1000):
+    if(pt_pd(i)):
+        millerlist3.append(i)
+while True:
+    while True:
+        pr = make_prime(10**1000,10**1001,primelist,millerlist1)
+        print('进行强伪素数测试:')
+        if(Miller_Rabin(pr,millerlist2)):
+            f = open('bigprime.txt','a')
+            f.write(str(pr) + '\n\n')
+            f.close()
+print(pr)
+print('All cost:',time.time() - start)
 #while True:
 #    print(pt_pd(int(input())))
 
