@@ -134,21 +134,24 @@ millerlist3=[]
 for i in range(2,10):
     if(pt_pd(i)):
         millerlist1.append(i)
-for i in range(10,100):
+for i in range(10,40):
     if(pt_pd(i)):
         millerlist2.append(i)
 #print(len(millerlist1)+len(millerlist2))
-for i in range(100,1000):
+for i in range(40,1000):
     if(pt_pd(i)):
         millerlist3.append(i)
 while True:
+    start = time.time()
     while True:
-        pr = make_prime(10**1000,10**1001,primelist,millerlist1)
+        pr = make_prime(10**2000,10**2001,primelist,millerlist1)
         print('进行强伪素数测试:')
         if(Miller_Rabin(pr,millerlist2)):
             f = open('bigprime.txt','a')
-            f.write(str(pr) + '\n\n')
+            f.write("cost:" + str(time.time() - start) + '\n' + str(pr) + '\n\n')
             f.close()
+            print("cost:",time.time() - start)
+            break
 print(pr)
 print('All cost:',time.time() - start)
 #while True:
