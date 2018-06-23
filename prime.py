@@ -144,7 +144,7 @@ for i in range(40,1000):
 while True:
     start = time.time()
     while True:
-        pr = make_prime(10**2000,10**2001,primelist,millerlist1)
+        pr = make_prime(10**1000,10**1001,primelist,millerlist1)
         print('进行强伪素数测试:')
         if(Miller_Rabin(pr,millerlist2)):
             f = open('bigprime.txt','a')
