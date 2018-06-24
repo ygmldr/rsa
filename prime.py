@@ -68,15 +68,7 @@ def quick_pow(a,n,p):
         a = a * a % p
         n >>= 1
     return ret
-    '''
-    if(n == 1):
-        return a
-    t = quick_pow(a,n>>1,p) % p
-    if((n&1)==1):
-        return t * t * a % p
-    else:
-        return t * t % p
-    '''
+
 def fakeprime(l,r,primelist):
     while(True):
         t = random.randint(l,r)
@@ -114,52 +106,87 @@ def Miller_Rabin(pt,primelist):
     return True
 
 def make_prime(l,r,primelist,millerlist):
-    cnt = 0
+    #cnt = 0
     while(True):
         t = fakeprime(l,r,primelist)
-        print('made fakernum ',cnt,'，Miller test start')
-        cnt += 1
+        #print('made fakernum ',cnt,'，Miller test start')
+        #cnt += 1
         if(Miller_Rabin(t,millerlist)):
             return t
 
-start = time.time()
+def exgcd(a,b):#ax+by=1
+    if(b == 0):
+        return a,1,0
+    gcd,tmp,y = exgcd(b,a%b)
+    x = y
+    y = tmp - int(a/b)*y
+    return gcd,x,y
 
-primelist=[]
-Erato(100000,primelist)
+def solve_function(a,b,c):#ax + by = c
+    gcd,x,y = exgcd(abs(a),abs(b))
+    if(c % gcd != 0):
+        print(gcd)
+        raise Exception
+    x *= c
+    y *= c
+    if(a < 0):
+        x = -x
+    if(b < 0):
+        y = -y
+    if(x < 0):
+        if(b < 0):
+            s = int((abs(x) - b + 1) / b)
+        else:
+            s = int((abs(x) + b - 1) / b)
+        x += s * b
+        y -= s * a
+    return x,y
 
-millerlist1=[]
-millerlist2=[]
-millerlist3=[]
 
-for i in range(2,10):
-    if(pt_pd(i)):
-        millerlist1.append(i)
-for i in range(10,40):
-    if(pt_pd(i)):
-        millerlist2.append(i)
-#print(len(millerlist1)+len(millerlist2))
-for i in range(40,1000):
-    if(pt_pd(i)):
-        millerlist3.append(i)
-while True:
-    start = time.time()
-    while True:
-        pr = make_prime(10**1000,10**1001,primelist,millerlist1)
-        print('进行强伪素数测试:')
-        if(Miller_Rabin(pr,millerlist2)):
-            f = open('bigprime.txt','a')
-            f.write("cost:" + str(time.time() - start) + '\n' + str(pr) + '\n\n')
-            f.close()
-            print("cost:",time.time() - start)
-            break
-print(pr)
-print('All cost:',time.time() - start)
-#while True:
-#    print(pt_pd(int(input())))
+def encrypt(message,N,e):
+    return quick_pow(message,e,N) % N
 
-#while True:
-#    s = input()
-#    l = int(s[:s.find(' ')])
-#    r = int(s[s.find(' '):])
-#    print(make_prime(l,r,primelist,millerlist))
+def decode(message,N,d):
+    return quick_pow(message,d,N) % N
+
+def makekey(l,r):
+
+    primelist=[]
+    millerlist=[]
+    Erato(100000,primelist)
+    Erato(20,millerlist)
+
+    prime1 = make_prime(l,r,primelist,millerlist)
+    prime2 = make_prime(l,r,primelist,millerlist)
+
+    N = prime1 * prime2
+    ef = (prime1 - 1) * (prime2 - 1)
+
+    del prime1
+    del prime2
+
+    l = ef / 10
+    r = ef / 3
     
+    while(True):
+        private_key = random.randint(l,r)*2+1
+        if(math.gcd(private_key,ef) == 1):
+            break
+
+    public_key,tmp = solve_function(private_key,-ef,1)
+
+    del tmp
+    del ef
+    
+    return N,private_key,public_key
+
+
+N,private_key,public_key = makekey(10**100,10**101)
+
+
+t = encrypt(int(input()),N,public_key)
+print('加密：',t)
+print('解密：',decode(t,N,private_key))
+print('公钥：%d\n私钥：%d' % (public_key,private_key))
+
+
